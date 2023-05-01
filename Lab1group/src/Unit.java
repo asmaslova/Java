@@ -81,12 +81,12 @@ class Elf extends Unit{
     void remove(int nx, int ny){
 
         if(nx < floor.width && ny < floor.height){
-            if (floor.cells[ny+1][nx+1] == '*'){
-                floor.cells[ny+1][nx+1] = '_';
+            if (floor.cells[ny][nx] == '*'){
+                floor.cells[ny][nx] = '_';
                 this.mana -= 5;
             }
             else{
-                System.out.println("There is no traps!");
+                System.out.println("There is noN traps!");
             }
         }
         else{
@@ -98,10 +98,10 @@ class Elf extends Unit{
         Scanner sc = new Scanner(System.in);
         String direction = sc.nextLine();
         switch (direction){
-            case "W": remove(x, y - 1); break;
-            case "S": remove(x, y + 1); break;
-            case "D": remove(x + 1, y); break;
-            case "A": remove(x - 1, y); break;
+            case "W": remove(x, y - 2); break;
+            case "S": remove(x, y + 2); break;
+            case "D": remove(x + 2, y); break;
+            case "A": remove(x - 2, y); break;
             default: System.out.println("Incorrect input! Try again!"); return;
         }
     }
