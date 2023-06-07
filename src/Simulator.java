@@ -1,41 +1,90 @@
+import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 class Simulator{
-    Pic topBar, botBar, bird;
-    float by = 0;
+    int score, a_score;
+    int small_size = 100;
+    JFrame help;
+    ArrayList<Circle> circles = new ArrayList<Circle>();
+    int time = 0;
+    Random rng = new Random();
+    Cursor cursor = new Cursor();
+
     Simulator(){
-        topBar = new Pic("images/bar.png");
-        botBar = new Pic("images/bar.png");
-        bird = new Pic("images/bird.png");
-        bird.setBounds(80,150,20,20);
-        genBars();
+        score = 0; a_score = 600;
 
     }
-
-    void genBars(){
-        Random rng = new Random();
-        int h = 50+rng.nextInt(100);
-        topBar.setBounds(200,0,50,200-h);
-        botBar.setBounds(200, 300-h,50,h);
-
+    boolean isCircle(int x, int y){
+        for(Circle c: circles){
+            if((x < c.xs + c.small_size) && (x > c.xs)){
+                if((y < c.ys + c.small_size) && (y > c.ys)){
+                     if (x*x + y*y <= (small_size/2)*(small_size/2)){
+                         return true;
+                     }
+                }
+            }
+        }
+        return false;
     }
 
     public int run(AI ai){
-        int delay = 30;
+
+        circles.add(new Circle(help));
+        int time_left=500;
         int total_time = 0;
-        while(total_time < 1000000){
-            total_time+=delay;
-            bird.setLocation(bird.getX(), (int)(bird.getY()+by*delay/1000));
-            by+=3;
-            topBar.setLocation(topBar.getX()-1, topBar.getY());
-            botBar.setLocation(botBar.getX()-1, botBar.getY());
-            if(bird.getBounds().intersects(topBar.getBounds()) || bird.getBounds().intersects(botBar.getBounds()) || bird.getY()<=0 || bird.getY()>=280){
-                return delay;
+        while(score<100000) {
+            //every 25 ms: -20pixels
+//time_left = c.xs - c.xb / 5 * 25
+            if (a_score <= 0) {
+                return total_time;
             }
-            if(topBar.getX()<-50){
-                genBars();
+            ArrayList<Circle> cc = new ArrayList<Circle>();
+            Circle round = circles.get(0);
+            if (time % 500 == 0) circles.add(new Circle(help));
+
+            int[] tmp = ai.shouldClick(cursor.curs.getX(), cursor.curs.getY(), round.xs, round.ys, time_left);
+            cursor.move(tmp[1],tmp[2]);
+            if ((tmp[0] == 1) && (isCircle(cursor.curs.getX(),cursor.curs.getY()))){
+                time += 2;
+                if (((round.xs - round.xb) < 15)) {
+                    score += 300 / 20;
+                    a_score += 40 / 10;
+                } else if (round.xs - round.xb < 25) {
+                    score += 13;
+                    a_score += 20 / 10;
+                } else if (round.xs - round.xb < 40) {
+                    score += 7;
+                    a_score += 1;
+                } else if (round.xs - round.xb < 60) {
+                    a_score -= 2;
+                } else {
+                    a_score -= 50;
+                }
+                cc.add(round);
             }
+
+            for (Circle c : circles) {
+
+                if ((c.xs - c.xb < -15)) {
+                    cc.add(c);
+                    a_score -= 50;
+                }
+                c.big_size -= 10;
+                c.xb += 5;
+                c.yb += 5;
+                c.change();
+
+            }
+            for (Circle c : cc) {
+                //c.hide(help);
+                circles.remove(c);
+
+            }
+            time += 25;
+            total_time += 25;
         }
         return total_time;
+
     }
 }

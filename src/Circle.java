@@ -18,8 +18,9 @@ public class Circle extends JComponent {
         yb = ys - 100;
         small_circle.setBounds(xs,ys,small_size,small_size);
         big_circle.setBounds(xb,yb,big_size,big_size);
+        if (frame != null){
         frame.add(small_circle);
-        frame.add(big_circle);
+        frame.add(big_circle);}
         //Circle c = new Circle(xs, ys, xb, yb, small_size, big_size);
     }
     /*void add(JFrame frame){
